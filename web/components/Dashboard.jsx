@@ -147,9 +147,14 @@ export default function Dashboard() {
         <h2 className="text-lg font-semibold text-red-200">Could not load data</h2>
         <p className="mt-2 text-sm text-red-200/80">{err}</p>
         <p className="mt-4 text-sm text-slate-400">
-          Set <code className="rounded bg-black/40 px-1">MONGODB_URI</code> on Vercel, run{" "}
-          <code className="rounded bg-black/40 px-1">python upload_to_mongo.py</code> from{" "}
-          <code className="rounded bg-black/40 px-1">stock_forecast</code> after training.
+          Set <code className="rounded bg-black/40 px-1">MONGODB_URI</code> on Vercel (full{" "}
+          <code className="rounded bg-black/40 px-1">mongodb+srv://</code> string from Atlas).
+          In Atlas → <strong>Network Access</strong>, allow <code className="rounded bg-black/40 px-1">0.0.0.0/0</code>{" "}
+          (or Vercel’s IPs). Then run{" "}
+          <code className="rounded bg-black/40 px-1">python upload_to_mongo.py</code> locally after training.
+        </p>
+        <p className="mt-2 text-xs text-slate-500">
+          If you see an SSL / TLS error, redeploy after the latest commit (the app forces IPv4 for Atlas).
         </p>
       </Card>
     );
