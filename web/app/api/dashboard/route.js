@@ -1,22 +1,28 @@
 import { NextResponse } from "next/server";
-import { getDB } from "@/lib/mongodb";
+import { createServiceClient } from "@/lib/supabase-server";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
 
 export async function GET() {
   try {
-    const db = await getDB();
-    const docs = await db.collection("dashboard").find({}).toArray();
+    const supabase = createServiceClient();
+    const { data: rows, error } = await supabase
+      .from("dashboard_documents")
+      .select("doc_type, payload");
+
+    if (error) throw new Error(error.message);
+
     const data = {};
-    for (const doc of docs) {
-      const t = doc.type;
-      if (!t) continue;
-      const rest = { ...doc };
-      delete rest._id;
-      delete rest.type;
-      data[t] = rest;
+    for (const row of rows ?? []) {
+      const t = row.doc_type;
+      if (!t || !row.payload) continue;
+      data[t] =
+        typeof row.payload === "object" && row.payload !== null
+          ? row.payload
+          : {};
     }
+
     return NextResponse.json({ ok: true, data });
   } catch (err) {
     const message = err instanceof Error ? err.message : "Unknown error";

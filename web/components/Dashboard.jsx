@@ -136,7 +136,7 @@ export default function Dashboard() {
     return (
       <div className="flex min-h-[60vh] flex-col items-center justify-center gap-3 text-slate-400">
         <Loader2 className="h-10 w-10 animate-spin text-violet-400" />
-        <p>Loading dashboard from MongoDB…</p>
+        <p>Loading dashboard from Supabase…</p>
       </div>
     );
   }
@@ -147,14 +147,12 @@ export default function Dashboard() {
         <h2 className="text-lg font-semibold text-red-200">Could not load data</h2>
         <p className="mt-2 text-sm text-red-200/80">{err}</p>
         <p className="mt-4 text-sm text-slate-400">
-          Set <code className="rounded bg-black/40 px-1">MONGODB_URI</code> on Vercel (full{" "}
-          <code className="rounded bg-black/40 px-1">mongodb+srv://</code> string from Atlas).
-          In Atlas → <strong>Network Access</strong>, allow <code className="rounded bg-black/40 px-1">0.0.0.0/0</code>{" "}
-          (or Vercel’s IPs). Then run{" "}
-          <code className="rounded bg-black/40 px-1">python upload_to_mongo.py</code> locally after training.
-        </p>
-        <p className="mt-2 text-xs text-slate-500">
-          If you see an SSL / TLS error, redeploy after the latest commit (the app forces IPv4 for Atlas).
+          In Vercel → Environment Variables, set{" "}
+          <code className="rounded bg-black/40 px-1">NEXT_PUBLIC_SUPABASE_URL</code> and{" "}
+          <code className="rounded bg-black/40 px-1">SUPABASE_SERVICE_ROLE_KEY</code> (from Supabase →
+          Project Settings → API; use <strong>service_role</strong>, not the database password). Run{" "}
+          <code className="rounded bg-black/40 px-1">supabase_schema.sql</code> in the SQL Editor first, then{" "}
+          <code className="rounded bg-black/40 px-1">python upload_to_supabase.py</code> after training.
         </p>
       </Card>
     );
@@ -187,7 +185,7 @@ export default function Dashboard() {
       {tab === "data" && (
         <div className="space-y-4">
           {!stockChartData.length ? (
-            <p className="text-slate-500">No stock price documents in MongoDB yet.</p>
+            <p className="text-slate-500">No stock data in Supabase yet. Run upload_to_supabase.py.</p>
           ) : (
             <>
               <div className="grid gap-3 sm:grid-cols-3">
@@ -271,7 +269,7 @@ export default function Dashboard() {
       {tab === "prediction" && (
         <div className="space-y-4">
           {!predictionChartData.length ? (
-            <p className="text-slate-500">No predictions in MongoDB. Run upload script after training.</p>
+            <p className="text-slate-500">No predictions in Supabase. Run upload_to_supabase.py after training.</p>
           ) : (
             <>
               <div className="grid gap-3 sm:grid-cols-3">

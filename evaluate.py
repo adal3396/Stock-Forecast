@@ -154,7 +154,7 @@ def main():
     ablation_study(df_norm, scalers, TICKERS, TARGET_COL, WINDOW_LEN, HOP)
 
     print("\n✅ All figures saved to figures/ directory.")
-    print("   Next: set MONGODB_URI and run python upload_to_mongo.py, then open web/ (npm run dev) or deploy web/ to Vercel.")
+    print("   Next: run supabase_schema.sql in Supabase SQL Editor, set SUPABASE_* env vars, run python upload_to_supabase.py, then open web/ or deploy to Vercel.")
 
 
 def ablation_study(df_norm, scalers, tickers, target_col, window_len, hop):

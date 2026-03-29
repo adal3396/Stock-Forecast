@@ -13,7 +13,7 @@ const geistMono = Geist_Mono({
 
 export const metadata = {
   title: "Stock Forecast — STFT + CNN",
-  description: "Financial time-series forecasting dashboard (MongoDB + Next.js on Vercel)",
+  description: "Financial time-series forecasting dashboard (Supabase + Next.js on Vercel)",
 };
 
 export default function RootLayout({ children }) {
