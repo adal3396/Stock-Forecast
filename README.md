@@ -1,99 +1,90 @@
-# 📈 Stock Price Forecasting — STFT + CNN
+# Stock Price Forecasting — STFT + CNN
 
-A **Pattern Recognition for Financial Time Series Forecasting** web application that combines Short-Time Fourier Transform (STFT) signal processing with Convolutional Neural Networks (CNN) to predict stock prices.
+**Pattern Recognition for Financial Time Series Forecasting** — STFT spectrograms + a CNN regressor, with a **Next.js** dashboard backed by **MongoDB** (deployable on [Vercel](https://vercel.com)).
 
 ![Python](https://img.shields.io/badge/Python-3.9+-blue?logo=python)
 ![TensorFlow](https://img.shields.io/badge/TensorFlow-2.16-orange?logo=tensorflow)
-![Streamlit](https://img.shields.io/badge/Streamlit-1.35-red?logo=streamlit)
+![Next.js](https://img.shields.io/badge/Next.js-16-black?logo=next.js)
 
-## 🚀 Features
+## Features
 
-- **Data Pipeline** — Downloads OHLCV data from Yahoo Finance for Indian stocks (RELIANCE, TCS, INFY) + macro signals (Sensex, USD-INR)
-- **Signal Processing** — FFT frequency spectrum + STFT spectrogram analysis with configurable window/hop parameters
-- **CNN Model** — 3-block convolutional architecture for regression-based price prediction
-- **Interactive Dashboard** — 4-tab Streamlit webapp with Plotly charts, metrics, and ablation study
-- **Ablation Study** — Measures feature importance by selectively removing data sources
+- **Data pipeline** — Yahoo Finance OHLCV (e.g. RELIANCE, TCS, INFY) + Sensex and USD-INR
+- **Signal processing** — FFT + STFT spectrograms (configurable window / hop in training)
+- **CNN** — Three conv blocks + regression head for normalized close prediction
+- **Web dashboard** — Four tabs (data, spectrogram, prediction, evaluation) served from `web/`, data from MongoDB
+- **Ablation study** — Feature-removal experiments (`evaluate.py` → CSV → uploaded with `upload_to_mongo.py`)
 
-## 📊 Dashboard Tabs
-
-| Tab | Description |
-|-----|-------------|
-| 📊 Data | Download & visualize raw stock prices |
-| 🌊 Spectrogram | FFT spectrum + STFT heatmap visualization |
-| 🤖 Prediction | CNN inference with predicted vs actual + error distribution |
-| 📐 Evaluation | Training curves, ablation study, generated figures gallery |
-
-## 🛠️ Setup & Installation
+## Python setup
 
 ```bash
-# Clone the repo
 git clone https://github.com/adal3396/Stock-Forecast.git
 cd Stock-Forecast
 
-# Create virtual environment
 python -m venv venv
-venv\Scripts\activate        # Windows
-# source venv/bin/activate   # Mac/Linux
+venv\Scripts\activate
 
-# Install dependencies
 pip install -r requirements.txt
 ```
 
-## ▶️ Usage
+## Usage
 
-### 1. Train the Model
-```bash
-python train.py
+1. **Train**
+
+   ```bash
+   python train.py
+   ```
+
+2. **Figures + ablation**
+
+   ```bash
+   python evaluate.py
+   ```
+
+3. **Upload results for the website** (requires Atlas connection string in env)
+
+   ```bash
+   set MONGODB_URI=mongodb+srv://USER:PASS@cluster.mongodb.net/
+   python upload_to_mongo.py
+   ```
+
+4. **Run dashboard locally**
+
+   ```bash
+   cd web
+   copy .env.example .env.local
+   rem Edit .env.local: set MONGODB_URI
+   npm install
+   npm run dev
+   ```
+
+   Open [http://localhost:3000](http://localhost:3000).
+
+## Deploy on Vercel
+
+1. Import this repo in Vercel.
+2. Set **Root Directory** to `web`.
+3. Add environment variable **`MONGODB_URI`** (same Atlas URI as upload script).
+4. Deploy.
+
+Ensure Atlas **Network Access** allows connections from your hosting region (often `0.0.0.0/0` for coursework).
+
+## Project layout
+
 ```
-Downloads stock data, builds STFT spectrograms, trains the CNN (~2 min).
-
-### 2. Generate Figures & Ablation Study
-```bash
-python evaluate.py
-```
-Generates all required figures in `figures/` directory.
-
-### 3. Launch the Dashboard
-```bash
-python -m streamlit run app.py
-```
-Opens at `http://localhost:8501`.
-
-## 📁 Project Structure
-
-```
-stock_forecast/
-├── preprocess.py       ← Data download, normalization, STFT, dataset building
-├── model.py            ← CNN architecture (3 conv blocks + regression head)
-├── train.py            ← Training pipeline with EarlyStopping + LR scheduling
-├── evaluate.py         ← All figures + ablation study
-├── app.py              ← Streamlit webapp (4 tabs)
-├── requirements.txt    ← Python dependencies
-├── saved_model/        ← Created after training
-├── figures/            ← Created after evaluation
-└── data/               ← Optional local CSV cache
+├── preprocess.py       # Data, normalization, STFT, dataset
+├── model.py            # CNN
+├── train.py            # Training
+├── evaluate.py         # Figures + ablation CSV
+├── upload_to_mongo.py # Pushes JSON docs to MongoDB for the UI
+├── requirements.txt
+├── web/                # Next.js app (Vercel)
+│   ├── app/
+│   ├── components/
+│   └── lib/mongodb.js
+├── saved_model/        # After train (gitignored)
+└── figures/            # After evaluate (gitignored)
 ```
 
-## 🧠 Architecture
-
-```
-Input (F × T_frames × C)
-    → Conv2D(32, 3×3) + BatchNorm + ReLU + MaxPool(2×2)
-    → Conv2D(64, 3×3) + BatchNorm + ReLU + MaxPool(2×2)
-    → Conv2D(128, 3×3) + BatchNorm + ReLU
-    → GlobalAveragePooling2D
-    → Dense(128) + Dropout(0.3)
-    → Dense(64) + ReLU
-    → Dense(1)  ← Predicted price
-```
-
-## 📚 Methodology
-
-1. **Data Preparation** — OHLCV + macro signals, MinMax normalization
-2. **STFT** — Sliding window (L=32, H=8) with Hann window → 2D spectrograms
-3. **CNN Training** — 50 epochs, EarlyStopping, ReduceLROnPlateau
-4. **Evaluation** — MSE, MAE, R² metrics + ablation study
-
-## 📜 License
+## License
 
 MIT License
